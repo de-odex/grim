@@ -138,7 +138,7 @@ proc newGraph*(name: string = "graph"): Graph =
   result.name = name
 
 proc addNode*(self: Graph, label: string, data: Table[string,
-    Box] = initTable[string, Box](), oid: EntityOid = genEntityOid()): EntityOid =
+    Box] = initTable[string, Box](2), oid: EntityOid = genEntityOid()): EntityOid =
   ## Add node to graph.
   let n = newNode(label, data = data, oid = oid)
 
@@ -149,7 +149,7 @@ proc addNode*(self: Graph, label: string, data: Table[string,
   self.nodeTable[n.oid] = n
   discard self
     .nodeIndex
-    .mgetOrPut(label, initTable[EntityOid, Node]())
+    .mgetOrPut(label, initTable[EntityOid, Node](2))
     .mgetOrPut(n.oid, n)
 
   result = n.oid
@@ -163,7 +163,7 @@ proc addNode*(self: Graph, n: Node): EntityOid =
   self.nodeTable[n.oid] = n
   discard self
     .nodeIndex
-    .mgetOrPut(n.label, initTable[EntityOid, Node]())
+    .mgetOrPut(n.label, initTable[EntityOid, Node](2))
     .mgetOrPut(n.oid, n)
 
   result = n.oid
@@ -178,11 +178,11 @@ proc addEdge*(self: Graph, e: Edge): EntityOid =
   self.edgeTable[e.oid] = e
   discard self
     .edgeIndex
-    .mgetOrPut(e.label, initTable[EntityOid, Edge]())
+    .mgetOrPut(e.label, initTable[EntityOid, Edge](2))
     .mgetOrPut(e.oid, e)
 
 proc addEdge*(self: Graph, A: Node, B: Node, label: string,
-    data: Table[string, Box] = initTable[string, Box](),
+    data: Table[string, Box] = initTable[string, Box](2),
         oid: EntityOid = genEntityOid()): EntityOid =
   ## Add edge to graph
   # Add nodes to graph if not already there
@@ -202,13 +202,13 @@ proc addEdge*(self: Graph, A: Node, B: Node, label: string,
   self.edgeTable[e.oid] = e
   discard self
     .edgeIndex
-    .mgetOrPut(e.label, initTable[EntityOid, Edge]())
+    .mgetOrPut(e.label, initTable[EntityOid, Edge](2))
     .mgetOrPut(e.oid, e)
 
   result = e.oid
 
 proc addEdge*(self: Graph, A: EntityOid, B: EntityOid, label: string,
-  data: Table[string, Box] = initTable[string, Box](),
+  data: Table[string, Box] = initTable[string, Box](2),
       oid: EntityOid = genEntityOid()): EntityOid =
   ## Add edge to graph.
   let e = newEdge(self.nodeTable[A], self.nodeTable[B], label,
@@ -222,7 +222,7 @@ proc addEdge*(self: Graph, A: EntityOid, B: EntityOid, label: string,
   self.edgeTable[e.oid] = e
   discard self
     .edgeIndex
-    .mgetOrPut(e.label, initTable[EntityOid, Edge]())
+    .mgetOrPut(e.label, initTable[EntityOid, Edge](2))
     .mgetOrPut(e.oid, e)
 
   result = e.oid

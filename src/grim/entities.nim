@@ -51,16 +51,18 @@ proc parseEntityOid*(s: string): EntityOid =
   s
 
 proc newNode*(label: string, data: Table[string, Box] = initTable[string,
-Box](), oid: EntityOid = genEntityOid()): Node =
+Box](2), oid: EntityOid = genEntityOid()): Node =
   ## Create a new node
   new result
 
   result.label = label
   result.data = data
   result.oid = oid
+  result.outgoing = initTable[EntityOid, Table[EntityOid, Edge]](2)
+  result.incoming = initTable[EntityOid, Table[EntityOid, Edge]](2)
 
 proc newEdge*(A: Node, B: Node, label: string,
-    data: Table[string, Box] = initTable[string, Box](),
+    data: Table[string, Box] = initTable[string, Box](2),
         oid: EntityOid = genEntityOid()): Edge =
   ## Create a new edge
   new result
@@ -73,11 +75,11 @@ proc newEdge*(A: Node, B: Node, label: string,
 
   # Modify nodes' adjacency tables
   discard A.outgoing
-  .mgetOrPut(B.oid, initTable[EntityOid, Edge]())
+  .mgetOrPut(B.oid, initTable[EntityOid, Edge](2))
   .mgetOrPut(result.oid, result)
 
   discard B.incoming
-  .mgetOrPut(A.oid, initTable[EntityOid, Edge]())
+  .mgetOrPut(A.oid, initTable[EntityOid, Edge](2))
   .mgetOrPut(result.oid, result)
 
 proc delete*(e: Edge) =
@@ -214,12 +216,12 @@ proc between*(A, B: Node, direction: Direction = Direction.Out): (iterator: Edge
     # Outgoing edges between A and B
     outgoing = A
       .outgoing
-      .getOrDefault(B.oid, initTable[EntityOid, Edge]())
+      .getOrDefault(B.oid, initTable[EntityOid, Edge](2))
 
     # Incoming edges between A and B
     incoming = A
       .incoming
-      .getOrDefault(B.oid, initTable[EntityOid, Edge]())
+      .getOrDefault(B.oid, initTable[EntityOid, Edge](2))
 
   # Create closure iterators for edges between A and B
   iterator outgoingIt: Edge {.closure, gensym.} =
