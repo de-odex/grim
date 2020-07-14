@@ -44,8 +44,14 @@ template `.`*(map: Map, entry: untyped): untyped =
   ## Access entities by dot notation
   map.entries[astToStr(entry)]
 
+proc genEntityOid*(): EntityOid =
+  $genOid()
+
+proc parseEntityOid*(s: string): EntityOid =
+  s
+
 proc newNode*(label: string, data: Table[string, Box] = initTable[string,
-Box](), oid: string = $genOid()): Node =
+Box](), oid: EntityOid = genEntityOid()): Node =
   ## Create a new node
   new result
 
@@ -55,7 +61,7 @@ Box](), oid: string = $genOid()): Node =
 
 proc newEdge*(A: Node, B: Node, label: string,
     data: Table[string, Box] = initTable[string, Box](),
-        oid: string = $genOid()): Edge =
+        oid: EntityOid = genEntityOid()): Edge =
   ## Create a new edge
   new result
 
@@ -150,18 +156,18 @@ proc update*[T](self: T, p: Table[string, Box]): string =
 
   result = self.oid
 
-proc neighbors*(n: Node, direction: Direction = Direction.Out): (iterator: string) =
+proc neighbors*(n: Node, direction: Direction = Direction.Out): (iterator: EntityOid) =
   ## Return neighbors to `n` counting edges with `direction`.
   # Create closure iterator for neighbors
-  iterator outgoingIt: string {.closure, gensym.} =
+  iterator outgoingIt: EntityOid {.closure, gensym.} =
     for oid in n.outgoing.keys:
       yield oid
 
-  iterator incomingIt: string {.closure, gensym.} =
+  iterator incomingIt: EntityOid {.closure, gensym.} =
     for oid in n.incoming.keys:
       yield oid
 
-  iterator bothIt: string {.closure, gensym.} =
+  iterator bothIt: EntityOid {.closure, gensym.} =
     for oid in n.outgoing.keys:
       yield oid
     for oid in n.incoming.keys:
