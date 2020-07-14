@@ -8,7 +8,7 @@ from yaml import guessType, TypeHint
 
 type
   ## Determines what value is kept in the box.
-  BoxKind = enum
+  BoxKind* = enum
     bxNull,
     bxInt,
     bxFloat,
@@ -23,6 +23,9 @@ type
     of bxFloat: floatVal: float
     of bxBool: boolVal: bool
     of bxNull: discard
+
+proc kind*(b: Box): BoxKind =
+  b.kind
 
 proc `$`(bx: BoxKind): string =
   ## Stringify the kind of value in the box.
