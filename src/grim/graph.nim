@@ -60,7 +60,7 @@ template nodes*(self: Graph, labels: untyped = newSeq[string](),
         let node {.inject, used.} = n.toMap
         if filter:
           yield n
-  
+
   it
 
 template edges*(self: Graph, labels: untyped = newSeq[string](),
@@ -105,7 +105,7 @@ proc `$`*(self: Graph): string =
 
   result = fmt("[Graph \"{m}\" with {i} node(s) {nodeStats} and {j} edge(s) {edgeStats}]")
 
-proc contains*(self: Graph, key: string): bool =
+proc contains*(self: Graph, key: EntityOid): bool =
   ## Check if Node or Edge oid is in Graph
   result = key in self.nodeTable or key in self.edgeTable
 
@@ -124,7 +124,7 @@ proc newGraph*(name: string = "graph"): Graph =
   result.name = name
 
 proc addNode*(self: Graph, label: string, data: Table[string,
-    Box] = initTable[string, Box](), oid: string = $genOid()): string =
+    Box] = initTable[string, Box](), oid: EntityOid = $genOid()): EntityOid =
   ## Add node to graph.
   let n = newNode(label, data = data, oid = oid)
 
@@ -140,7 +140,7 @@ proc addNode*(self: Graph, label: string, data: Table[string,
 
   result = n.oid
 
-proc addNode*(self: Graph, n: Node): string =
+proc addNode*(self: Graph, n: Node): EntityOid =
   ## Add node to graph.
   # Don't add if node already in graph
   if n in self:
@@ -154,7 +154,7 @@ proc addNode*(self: Graph, n: Node): string =
 
   result = n.oid
 
-proc addEdge*(self: Graph, e: Edge): string =
+proc addEdge*(self: Graph, e: Edge): EntityOid =
   ## Add edge to graph.
   # Don't add if edge already in graph
   if e in self:
@@ -169,7 +169,7 @@ proc addEdge*(self: Graph, e: Edge): string =
 
 proc addEdge*(self: Graph, A: Node, B: Node, label: string,
     data: Table[string, Box] = initTable[string, Box](),
-        oid: string = $genOid()): string =
+        oid: EntityOid = $genOid()): EntityOid =
   ## Add edge to graph
   # Add nodes to graph if not already there
   if A notin self:
@@ -193,9 +193,9 @@ proc addEdge*(self: Graph, A: Node, B: Node, label: string,
 
   result = e.oid
 
-proc addEdge*(self: Graph, A: string, B: string, label: string,
+proc addEdge*(self: Graph, A: EntityOid, B: EntityOid, label: string,
   data: Table[string, Box] = initTable[string, Box](),
-      oid: string = $genOid()): string =
+      oid: EntityOid = $genOid()): EntityOid =
   ## Add edge to graph.
   let e = newEdge(self.nodeTable[A], self.nodeTable[B], label,
       data = data, oid = oid)
@@ -213,10 +213,10 @@ proc addEdge*(self: Graph, A: string, B: string, label: string,
 
   result = e.oid
 
-template neighbors*(self: Graph, oid: string, filter: untyped = true, direction: Direction = Direction.Out): (
-        iterator: string) =
+template neighbors*(self: Graph, oid: EntityOid, filter: untyped = true, direction: Direction = Direction.Out): (
+        iterator: EntityOid) =
   ## Return neighbors to node `oid` in graph `g`, in `direction`, conditioned on `filter`.
-  iterator it: string {.closure, gensym.} =
+  iterator it: EntityOid {.closure, gensym.} =
     for n_oid in self.nodeTable[oid].neighbors(direction):
       let node {.inject, used.} = self.nodeTable[n_oid].toMap
       if filter:
@@ -224,7 +224,7 @@ template neighbors*(self: Graph, oid: string, filter: untyped = true, direction:
 
   it
 
-template edgesBetween*(self: Graph, A: string, B: string,  filter: untyped = true, direction: Direction = Direction.Out): (iterator: Edge) =
+template edgesBetween*(self: Graph, A: EntityOid, B: EntityOid, filter: untyped = true, direction: Direction = Direction.Out): (iterator: Edge) =
   ## Iterator for all edges between nodes `A` and `B` in `direction`, conditioned on `filter`.
   iterator it: Edge {.closure, gensym.} =
     if A in self and B in self:
@@ -235,15 +235,15 @@ template edgesBetween*(self: Graph, A: string, B: string,  filter: untyped = tru
 
   it
 
-proc node*(self: Graph, node: string): Node =
+proc node*(self: Graph, node: EntityOid): Node =
   ## Return node with `oid` in graph
   result = self.nodeTable[node]
 
-proc edge*(self: Graph, edge: string): Edge =
+proc edge*(self: Graph, edge: EntityOid): Edge =
   ## Return edge with `oid` in graph
   result = self.edgeTable[edge]
 
-proc hasEdge*(self: Graph, A: string, B: string,
+proc hasEdge*(self: Graph, A: EntityOid, B: EntityOid,
     direction: Direction = Direction.Out): bool =
   ## Check if there is an edge between nodes `A` and `B` in `direction` in the graph.
   if A notin self or B notin self:
@@ -251,7 +251,7 @@ proc hasEdge*(self: Graph, A: string, B: string,
 
   return self.nodeTable[A].connected(self.nodeTable[B], direction = direction)
 
-proc delEdge*(self: Graph, oid: string): bool =
+proc delEdge*(self: Graph, oid: EntityOid): bool =
   ## Delete edge with `oid` in graph, return true if edge was in graph and false otherwise.
   let
     e = self.edgeTable[oid]
@@ -270,7 +270,7 @@ proc delEdge*(self: Graph, oid: string): bool =
 
   result = true
 
-proc delNode*(self: Graph, oid: string): bool =
+proc delNode*(self: Graph, oid: EntityOid): bool =
   ## Delete node with `oid` in graph, return true if node was in graph and false otherwise.
   if oid notin self:
     return false
