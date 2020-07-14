@@ -138,7 +138,7 @@ proc newGraph*(name: string = "graph"): Graph =
   result.name = name
 
 proc addNode*(self: Graph, label: string, data: Table[string,
-    Box] = initTable[string, Box](), oid: EntityOid = $genOid()): EntityOid =
+    Box] = initTable[string, Box](), oid: EntityOid = genEntityOid()): EntityOid =
   ## Add node to graph.
   let n = newNode(label, data = data, oid = oid)
 
@@ -183,7 +183,7 @@ proc addEdge*(self: Graph, e: Edge): EntityOid =
 
 proc addEdge*(self: Graph, A: Node, B: Node, label: string,
     data: Table[string, Box] = initTable[string, Box](),
-        oid: EntityOid = $genOid()): EntityOid =
+        oid: EntityOid = genEntityOid()): EntityOid =
   ## Add edge to graph
   # Add nodes to graph if not already there
   if A notin self:
@@ -209,7 +209,7 @@ proc addEdge*(self: Graph, A: Node, B: Node, label: string,
 
 proc addEdge*(self: Graph, A: EntityOid, B: EntityOid, label: string,
   data: Table[string, Box] = initTable[string, Box](),
-      oid: EntityOid = $genOid()): EntityOid =
+      oid: EntityOid = genEntityOid()): EntityOid =
   ## Add edge to graph.
   let e = newEdge(self.nodeTable[A], self.nodeTable[B], label,
       data = data, oid = oid)
