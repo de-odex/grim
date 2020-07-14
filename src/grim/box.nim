@@ -233,7 +233,19 @@ proc `%`*(t: tuple): Table[string, Box] =
 proc toTable*(j: JsonNode): Table[string, Box] =
   ## Convert JsonNode with simple values to table with boxes.
   for (property, value) in j.pairs:
-    result[property] = guessBox($value)
+    result[property] = case j.kind
+    of JInt:
+      initBox(j.getInt)
+    of JFloat:
+      initBox(j.getFloat)
+    of JBool:
+      initBox(j.getBool)
+    of JString:
+      initBox(j.getStr)
+    of JNull:
+      initBox()
+    else:
+      initBox($j)
 
 proc `$`*(t: Table[string, Box]): string =
   ## Pretty-print String table with Boxes
