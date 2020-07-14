@@ -2,6 +2,7 @@
 import tables
 import json
 import strutils
+import typetraits
 
 # 3:rd party imports
 from yaml import guessType, TypeHint
@@ -225,6 +226,7 @@ proc `>=`*[T](self: Box, value: T): bool =
 
 proc `%`*(t: tuple): Table[string, Box] =
   ## Convert tuple to Table[string, Box]
+  result = initTable[string, Box](rightSize t.tupleLen)
   for label, value in t.fieldPairs:
     result[label] = initBox(value)
 
