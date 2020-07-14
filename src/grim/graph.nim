@@ -38,7 +38,21 @@ proc edgeLabels*(self: Graph): seq[string] =
   for label in self.edgeIndex.keys:
     result.add(label)
 
-template nodes*(self: Graph, labels: untyped = newSeq[string](),
+iterator nodes*(self: Graph): Node =
+  ## Iterator for nodes in graph.
+  ## More efficient than the filterable version.
+
+  for node in self.nodeTable.values:
+    yield node
+
+iterator edges*(self: Graph): Edge =
+  ## Return iterator for edges in graph.
+  ## More efficient than the filterable version.
+
+  for edge in self.edgeTable.values:
+    yield edge
+
+template nodes*(self: Graph, labels: untyped,
     filter: untyped = true): (iterator: Node) =
   ## Return iterator for nodes with `labels` in graph, conditioned on `filter`.
   # Empty `labels` means use all labels
@@ -63,7 +77,7 @@ template nodes*(self: Graph, labels: untyped = newSeq[string](),
 
   it
 
-template edges*(self: Graph, labels: untyped = newSeq[string](),
+template edges*(self: Graph, labels: untyped,
     filter: untyped = true): (iterator: Edge) =
   ## Return iterator for edges with `labels` in graph, conditioned on `filter`.
   # Empty `labels` means use all labels
